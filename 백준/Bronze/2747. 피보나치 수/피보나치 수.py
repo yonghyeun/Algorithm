@@ -1,4 +1,4 @@
-memo = {0 : 1 , 1: 1}
+memo = {1 : 1 , 2: 1}
 
 def memo_fibo(n : int) -> int:
   if n in memo:
@@ -9,5 +9,4 @@ def memo_fibo(n : int) -> int:
     return memo[n]
   
 N = int(input())
-memo_fibo(N)
-print(memo[N-1])
+print(memo_fibo(N))
