@@ -11,10 +11,12 @@ for i in range(N):
       heapq.heappush(hq , var)
   
   for var in arr:
-    root = heapq.heappop(hq)
+    root = hq[0]
     if var >= root:
+      heapq.heappop(hq)
       heapq.heappush(hq , var)
     else:
-      heapq.heappush(hq , root)
+      continue
+
 
 print(hq[0])
