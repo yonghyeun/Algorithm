@@ -1,21 +1,24 @@
-answer = []
-
-while True:
+def solve():
+  i = 1
+  while True:
+    string = input()
+    if '-' in string:
+      break
     stack = []
-    count = 0
-    s = input()
-    if '-' in s:
-        break
-    for i in range(len(s)):
-        if not stack and s[i] == '}':
-            count += 1
-            stack.append('{')
-        elif stack and s[i] == '}':
-            stack.pop()
-        else:
-            stack.append(s[i])
-    count += len(stack)//2
-    answer.append(count)
+    cnt = 0
 
-for i in range(len(answer)):
-    print(i+1, '. ', answer[i], sep='')
+    for s in string:
+      if s == '}' and stack:
+        stack.pop()
+      elif s == '}' and not stack:
+        cnt += 1
+        stack.append('{')
+      else:
+        stack.append(s)
+    
+    cnt += len(stack) // 2
+
+    print(f'{i}. {cnt}')
+    i += 1
+
+solve()
