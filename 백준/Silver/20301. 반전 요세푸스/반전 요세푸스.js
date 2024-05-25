@@ -1,114 +1,101 @@
 const fs = require('fs');
-const filePath = process.platform === 'linux' ? '/dev/stdin' : __dirname + '/input.txt';
+const filePath =
+  process.platform === 'linux' ? '/dev/stdin' : __dirname + '/input.txt';
 
 const [N, K, M] = fs.readFileSync(filePath).toString().split(' ').map(Number);
 
 class Node {
-  constructor(value) {
+  constructor(value, next = null, prev = null) {
     this.value = value;
-    this.next = null;
-    this.prev = null;
+    this.next = next;
+    this.prev = prev;
   }
 }
 
-class Dequeue {
+class CircularLinkedList {
   constructor() {
     this.head = null;
     this.tail = null;
     this.length = 0;
+    this.pointer = null;
   }
 
-  push(newNode) {
-    const node = newNode instanceof Node ? newNode : new Node(newNode);
+  insert(value) {
+    const node = new Node(value);
     if (this.length === 0) {
       this.head = node;
       this.tail = node;
+      this.pointer = new Node(null, this.head, this.tail);
     } else {
-      this.tail.next = node;
-      node.prev = this.tail;
+      [this.tail.next, node.prev] = [node, this.tail];
+      [this.head.prev, node.next] = [node, this.head];
       this.tail = node;
     }
     this.length += 1;
   }
 
-  pushLeft(newNode) {
-    const node = newNode instanceof Node ? newNode : new Node(newNode);
-    if (this.length === 0) {
-      this.head = node;
-      this.tail = node;
-    } else {
-      this.head.prev = node;
-      node.next = this.head;
-      this.head = node;
-    }
-    this.length += 1;
-  }
-
-  pop() {
-    if (this.length === 0) {
-      throw new Error('Deque is empty');
-    }
-    const returnNode = this.tail;
-    if (this.length === 1) {
-      this.tail = null;
-      this.head = null;
-    } else {
-      this.tail = this.tail.prev;
-      this.tail.next = null;
-    }
-    this.length -= 1;
-    return returnNode.value;
-  }
-
-  popLeft() {
-    if (this.length === 0) {
-      throw new Error('Deque is empty');
-    }
-    const returnNode = this.head;
-    if (this.length === 1) {
-      this.tail = null;
-      this.head = null;
-    } else {
-      this.head = this.head.next;
-      this.head.prev = null;
-    }
-    this.length -= 1;
-    return returnNode.value;
-  }
-
-  rotate(steps, direction) {
-    if (this.length <= 1) return;
+  move(step, direction) {
     if (direction === 1) {
-      while (steps--) {
-        this.push(this.popLeft());
+      while (step--) {
+        this.pointer = this.pointer.next;
       }
     } else {
-      while (steps--) {
-        this.pushLeft(this.pop());
+      while (step--) {
+        this.pointer = this.pointer.prev;
       }
     }
+  }
+
+  slice() {
+    this.pointer.prev.next = this.pointer.next;
+    this.pointer.next.prev = this.pointer.prev;
+  }
+
+  remove() {
+    if (this.length === 0) {
+      return;
+    }
+    const returnNode = this.pointer;
+
+    if (this.length === 1) {
+      this.length -= 1;
+      this.head = null;
+      this.tail = null;
+      this.pointer = null;
+      return returnNode.value;
+    }
+    if (this.lenngth === 2) {
+      this.length -= 1;
+      this.head = this.pointer.next;
+      this.tail = null;
+      return returnNode.value;
+    }
+    /* length 가 3이상일 경우엔 slice 호출 */
+    this.slice();
+    this.length -= 1;
+    return returnNode.value;
   }
 }
 
 function solution() {
-  const dequeue = new Dequeue();
-  for (let i = 1; i <= N; i++) {
-    dequeue.push(i);
+  const LinkedList = new CircularLinkedList();
+  for (let i = 1; i <= N; i += 1) {
+    LinkedList.insert(i);
   }
+
   const result = [];
-  let flag = 1;
+  let direction = 1; /* 1은 정방향 , -1은 역방향 */
   let cnt = 0;
-  
-  while (dequeue.length !== 0) {
+
+  while (LinkedList.length !== 0) {
     if (cnt === M) {
-      flag *= -1;
+      direction *= -1;
       cnt = 0;
     }
-    dequeue.rotate(K - 1, flag);
-    result.push(flag === 1 ? dequeue.popLeft() : dequeue.pop());
+    LinkedList.move(K, direction);
+    result.push(LinkedList.remove());
     cnt += 1;
   }
-  
   console.log(result.join('\n'));
 }
 
