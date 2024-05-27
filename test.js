@@ -1,79 +1,70 @@
 const fs = require('fs');
 const filePath =
   process.platform === 'linux' ? '/dev/stdin' : __dirname + '/input.txt';
+let inputs = fs.readFileSync(filePath).toString().split('\n');
+const [N, K] = inputs[0].split(' ').map(Number);
+let GlobalArr = inputs[1].split(' ').map(Number);
 
-const [N, K, M] = fs.readFileSync(filePath).toString().split(' ').map(Number);
-
-class Node {
-  constructor(value) {
-    this.value = value;
-    this.next = null;
-    this.prev = null;
-  }
-}
-
-class Dequeue {
-  constructor() {
-    this.head = null;
-    this.tail = null;
-  }
-
-  connect(prevNode, nextNode) {
-    prevNode.next = nextNode;
-    nextNode.prev = prevNode;
-  }
-
-  enqueue(node) {
-    if (!(node instanceof Node)) {
-      node = new Node(node);
-    }
-    if (this.head === null) {
-      this.head = node;
-      this.tail = node; // 어차피 head 가 비었으면 tail도 비었음
-    } else {
-      this.connect(node, this.head);
-      this.head = node;
-    }
-  }
-
-  dequeue() {
-    if (this.head === null) {
-      throw new Error('dequeue 가 이미 비었슈');
-    }
-    const returnValue = this.head.value;
-    this.head = this.head.next;
-    this.head.prev = null;
-    return returnValue;
-  }
-
-  push(node) {
-    if (!(node instanceof Node)) {
-      node = new Node(node);
-    }
-    if (this.tail === null) {
-      this.tail = node;
-      this.head = node;
-    }
-    this.connect(this.tail, node);
-    this.tail = node;
-  }
-
-  pop() {
-    if (this.tail === null) {
-      throw new Error('dequeue 가 비었슈');
-    }
-    const returnValue = this.tail.value;
-    this.tail = this.tail.prev;
-    this.tail.next = null;
-    return returnValue;
-  }
-}
-
-/* 요세푸스 문제 */
+let cnt = 0;
+let answer = -1;
 function solution() {
-  let person = Array.from({ length: N }, (_, idx) => idx + 1);
-  const arr = new Dequeue();
-  for (let value)
+  function mergeSort(arr, start, end) {
+    // endPoint
+    if (start >= end) {
+      return;
+    }
+
+    const mid = Math.floor((start + end) / 2);
+    mergeSort(arr, start, mid); // mid 기준 좌측 배열 정렬 후 탈출
+    mergeSort(arr, mid + 1, end); // mid 기준 우측 배열 정렬 후 탈출
+    merge(arr, start, mid, end); // 호출 마다 mid 기준 좌측, 우측 배열 이용하여 전체 배열 정렬
+  }
+
+  function merge(arr, start, mid, end) {
+    const leftArr = arr.slice(start, mid + 1);
+    const leftLength = mid + 1 - start;
+
+    const rightArr = arr.slice(mid + 1, end + 1);
+    const rightLenght = end - mid;
+
+    let leftPointer = 0;
+    let rightPointer = 0;
+    let GlobalPointer = start;
+
+    console.log('------');
+    console.log(`정렬 전 : ${GlobalArr}`);
+
+    while (leftPointer < leftLength && rightPointer < rightLenght) {
+      if (leftArr[leftPointer] <= rightArr[rightPointer]) {
+        arr[GlobalPointer++] = leftArr[leftPointer++];
+      } else {
+        arr[GlobalPointer++] = rightArr[rightPointer++];
+      }
+      cnt++;
+      if (cnt === K) answer = arr[GlobalPointer - 1];
+    }
+
+    while (leftPointer < leftLength) {
+      arr[GlobalPointer++] = leftArr[leftPointer++];
+      cnt++;
+      if (cnt === K) answer = arr[GlobalPointer - 1];
+    }
+
+    while (rightPointer < rightLenght) {
+      arr[GlobalPointer++] = rightArr[rightPointer++];
+      cnt++;
+      if (cnt === K) answer = arr[GlobalPointer - 1];
+    }
+
+    console.log(`왼쪽 배열 : ${leftArr}`);
+    console.log(`오른쪽 배열 : ${rightArr}`);
+    console.log(`정렬 후 : ${GlobalArr}`);
+  }
+
+  mergeSort(GlobalArr, 0, N - 1);
+  console.log('------');
+  console.log(GlobalArr);
+  console.log(answer);
 }
 
 solution();
