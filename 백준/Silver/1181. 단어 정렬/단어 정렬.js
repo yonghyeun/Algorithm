@@ -3,7 +3,9 @@ const fs = require("fs");
 const filePath =
   process.platform === "linux" ? "/dev/stdin" : __dirname + "/input.txt";
 
-let [N, ...array] = fs.readFileSync(filePath).toString().trim().split("\n");
+let [N, ..._array] = fs.readFileSync(filePath).toString().trim().split("\n");
+
+const array = [...new Set(_array)];
 
 const stringMap = array.reduce((map, string) => {
   const length = string.length;
