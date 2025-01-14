@@ -4,8 +4,7 @@ def memo_fibo(n : int) -> int:
   if n in memo:
     return memo[n]
   else:
-    temp = memo_fibo(n-1) + memo_fibo(n-2)
-    memo[n] = temp 
+    memo[n] = memo_fibo(n-1) + memo_fibo(n-2) 
     return memo[n]
   
 N = int(input())
