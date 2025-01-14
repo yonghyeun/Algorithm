@@ -40,9 +40,9 @@ const insertSort = (array) => {
 };
 
 const lengthSortedArray = Object.values(stringMap).map(Object.keys);
-lengthSortedArray.forEach((array) => {
+const result = lengthSortedArray.flatMap((array) => {
   insertSort(array);
-  array.forEach((string) => {
-    console.log(string);
-  });
+  return array;
 });
+
+console.log(result.join("\n"));
