@@ -12,7 +12,7 @@ dp[1] = 1;
 dp[2] = 2;
 
 for (let i = 3; i <= N; i++) {
-  const result = (dp[i - 1] % 10007) + (dp[i - 2] % 10007);
+  const result = dp[i-1] + dp[i-2]
   dp[i] = result % 10007;
 }
 
