@@ -5,6 +5,7 @@ const filePath =
   process.platform === "linux"
     ? "/dev/stdin"
     : path.join(__dirname, "input.txt");
+
 const [N, ...array] = fs
   .readFileSync(filePath)
   .toString()
@@ -12,32 +13,29 @@ const [N, ...array] = fs
   .split("\n")
   .flatMap((v) => v.split(" ").map(Number));
 
-const lis = (arr) => {
-  const P = [];
-  const binarySearch = (P, target) => {
-    let left = 0;
-    let right = P.length - 1;
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-      if (P[mid] < target) {
-        left = mid + 1;
-      } else {
-        right = mid - 1;
-      }
-    }
-    return left;
-  };
+// D[i] = k 일 때를 만족하는 array[i]의 최소값
+// kArray[1] = 35 가 의미하는 것은 길이가 1인 부분배열들 중 가장 마지막 원소에 올 수 있는 값은 35
+const kArray = [0];
 
-  for (const num of arr) {
-    const pos = binarySearch(P, num);
-    if (pos < P.length) {
-      P[pos] = num;
+for (let i = 0; i < N; i++) {
+  let start = 0;
+  let end = kArray.length - 1;
+
+  while (start <= end) {
+    const mid = Math.floor((start + end) / 2);
+
+    if (kArray[mid] < array[i]) {
+      start = mid + 1;
     } else {
-      P.push(num);
+      end = mid - 1;
     }
   }
 
-  return P.length;
-};
+  if (start === kArray.length) {
+    kArray.push(array[i]);
+  } else {
+    kArray[start] = array[i];
+  }
+}
 
-console.log(lis(array));
+console.log(kArray.length - 1);
