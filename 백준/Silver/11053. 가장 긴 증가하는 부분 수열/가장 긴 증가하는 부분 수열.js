@@ -5,7 +5,6 @@ const filePath =
   process.platform === "linux"
     ? "/dev/stdin"
     : path.join(__dirname, "input.txt");
-
 const [N, ...array] = fs
   .readFileSync(filePath)
   .toString()
@@ -13,14 +12,32 @@ const [N, ...array] = fs
   .split("\n")
   .flatMap((v) => v.split(" ").map(Number));
 
-const dp = Array(N).fill(1);
+const lis = (arr) => {
+  const P = [];
+  const binarySearch = (P, target) => {
+    let left = 0;
+    let right = P.length - 1;
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      if (P[mid] < target) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+    return left;
+  };
 
-for (let index = 1; index < N; index++) {
-  const kArray = dp
-    .slice(0, index)
-    .filter((_, kIndex) => array[index] > array[kIndex]);
+  for (const num of arr) {
+    const pos = binarySearch(P, num);
+    if (pos < P.length) {
+      P[pos] = num;
+    } else {
+      P.push(num);
+    }
+  }
 
-  dp[index] = Math.max(...kArray, 0) + 1;
-}
+  return P.length;
+};
 
-console.log(Math.max(...dp));
+console.log(lis(array));
