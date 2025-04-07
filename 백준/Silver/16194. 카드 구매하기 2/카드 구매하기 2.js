@@ -6,27 +6,20 @@ const filePath =
     ? "/dev/stdin"
     : path.join(__dirname, "input.txt");
 
-const [N, ...array] = fs
+const [N, ...cards] = fs
   .readFileSync(filePath)
   .toString()
-  .split("\n")
-  .flatMap((str) => str.split(" ").map(Number));
+  .trim()
+  .split(/\s+/)
+  .map(Number);
 
-// 전체 문제 : N 개의 카드를 가지기 위해 지불해야 하는 최대 P[i]
-// 부분 문제 : N 개의 카드를 가지기 위해 가격이 P[i] 인 카드를 몇 개 구매 할 수 있는가?
+const dp = Array(N + 1).fill(Infinity); // 충분히 큰 값으로 초기화
+dp[0] = 0; // 0개의 카드를 구매하는 비용은 0
 
-// 해결해야 하는 부분 문제 : 0 부터 N 개의 카드 중 i 번째 카드를 구매 할 때 낼 수 있는 최대 가격
-
-array.unshift(0);
-
-for (let i = 2; i <= N; i++) {
-  let min = array[i];
+for (let i = 1; i <= N; i++) {
   for (let j = 1; j <= i; j++) {
-    const div = Math.floor(i / j);
-    const mod = i % j;
-    min = Math.min(min, array[j] * div + array[mod]);
+    dp[i] = Math.min(dp[i], dp[i - j] + cards[j - 1]);
   }
-  array[i] = min;
 }
 
-console.log(array[N]);
+console.log(dp[N]);
